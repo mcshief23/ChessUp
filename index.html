@@ -1,663 +1,206 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101522">
-<title>CHESSUP — учись играть в шахматы</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171b1a">
+<title>CHESSUP — Chess training</title>
 <style>
-:root{--bg:#101522;--panel:rgba(28,38,57,.76);--panel2:rgba(39,53,76,.82);--text:#f3f7ff;--muted:#9eacc2;--accent:#62e0cf;--line:rgba(184,211,239,.16);--green:#8fe0b4}
-*{box-sizing:border-box}
-body{
- margin:0;
- background:
- radial-gradient(ellipse at 12% 4%,rgba(54,113,132,.30),transparent 34%),
- radial-gradient(ellipse at 92% 18%,rgba(91,77,160,.25),transparent 32%),
- radial-gradient(ellipse at 50% 100%,rgba(35,105,119,.18),transparent 40%),
- #101522;
- background-attachment:fixed;
- color:var(--text);
- font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
- min-height:100vh;
-}
-button{font:inherit;cursor:pointer}
-button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.app{max-width:1120px;margin:auto;padding:25px 18px 50px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{
- width:46px;height:46px;border-radius:14px;
- background:linear-gradient(145deg,#79f0dc,#3b9fbb);
- color:#10232e;display:grid;place-items:center;font-size:30px;
- box-shadow:0 8px 28px #4acbbd35,inset 0 1px 0 #ffffff80;
- border:1px solid #b5fff033;
-}
-.brand strong{letter-spacing:2.5px;font-size:19px}
-.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:2px}
-.stats{display:flex;gap:9px}
-.stat,.card,.lesson,.hero,.notice{
- background:linear-gradient(145deg,rgba(39,54,77,.78),rgba(24,33,50,.70));
- border:1px solid rgba(194,222,255,.15);
- box-shadow:0 12px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08);
- backdrop-filter:blur(16px) saturate(135%);
- -webkit-backdrop-filter:blur(16px) saturate(135%);
-}
-.stat{padding:9px 13px;border-radius:15px;font-weight:700}
-.nav{
- display:flex;gap:7px;overflow-x:auto;padding:7px;margin:0 0 13px;
- border:1px solid rgba(194,222,255,.11);border-radius:17px;
- background:rgba(20,29,45,.52);
- backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-}
-.nav button{
- white-space:nowrap;border:1px solid transparent;background:transparent;
- color:var(--muted);padding:11px 15px;border-radius:12px;transition:.2s ease;
-}
-.nav button.active{
- color:#eafffc;
- background:linear-gradient(135deg,rgba(80,202,190,.24),rgba(104,119,211,.20));
- border:1px solid rgba(107,232,218,.28);
- box-shadow:inset 0 1px 0 #ffffff15;
-}
-.page{display:none}
-.page.active{display:block}
-.hero{
- padding:30px;border-radius:23px;position:relative;overflow:hidden;
- background:
- radial-gradient(circle at 82% 20%,rgba(104,224,208,.20),transparent 28%),
- linear-gradient(120deg,rgba(40,91,105,.82),rgba(40,48,86,.88));
- border-color:rgba(125,234,220,.24);
- box-shadow:0 18px 45px #050b164f,inset 0 1px 0 #ffffff20;
-}
-.eyebrow{color:#8df0df;font-size:11px;font-weight:800;letter-spacing:2px}
-.hero h1{font-size:clamp(32px,6vw,52px);line-height:1.02;margin:13px 0}
-.hero p{color:#d0deed;max-width:520px;line-height:1.6}
-.hero:after{
- content:"♞";position:absolute;right:6%;bottom:-38px;
- font-size:190px;color:#9cf7e812;text-shadow:0 0 50px #66e5d722;
-}
-.btn{
- border:1px solid rgba(192,221,255,.17);
- background:rgba(43,60,84,.82);color:var(--text);
- padding:11px 15px;border-radius:12px;font-weight:700;
- box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
- transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
-}
-.btn.primary{
- color:#082522;border:1px solid rgba(176,255,241,.45);
- background:linear-gradient(135deg,#8af0d9,#48c5b7 58%,#49a9bd);
- box-shadow:0 9px 25px rgba(62,203,187,.22),inset 0 1px 0 #ffffffa6;
-}
-.btn:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 8px 22px #0003}
-.grid{display:grid;gap:14px}
-.stats-grid{grid-template-columns:repeat(3,1fr);margin:15px 0}
-.card{border-radius:20px;padding:17px}
-.big{font-size:27px;font-weight:850;margin:5px 0;color:#f7ffff}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.section-title{font-size:25px;margin:8px 0 5px}
-.progress{height:9px;background:rgba(7,16,29,.55);border-radius:20px;overflow:hidden;margin-top:12px}
-.progress span{
- display:block;height:100%;
- background:linear-gradient(90deg,#66ddc9,#8bafff);
- box-shadow:0 0 14px #62e0cf77;border-radius:20px;
-}
-.daily{grid-template-columns:repeat(3,1fr);margin-top:13px}
-.daily .card{text-align:center;padding:14px 8px}
-.daily .emoji{font-size:26px}
-.lesson-list{display:grid;gap:10px;margin:17px 0}
-.lesson{
- display:flex;align-items:center;gap:13px;text-align:left;width:100%;
- color:var(--text);padding:15px;border-radius:17px;transition:.18s ease;
-}
-.lesson:hover{transform:translateY(-2px);border-color:#68d9ce66}
-.lesson .ico{font-size:29px;filter:drop-shadow(0 3px 7px #0005)}
-.lesson span:nth-child(2){flex:1}
-.lesson small{display:block;color:var(--muted);margin-top:4px}
-.board-wrap{max-width:500px;margin:15px auto}
-.board{
- display:grid;grid-template-columns:repeat(8,1fr);width:100%;aspect-ratio:1;
- border:5px solid rgba(194,222,255,.20);border-radius:13px;overflow:hidden;
- box-shadow:0 18px 38px #0006,0 0 0 1px #ffffff0c;
-}
-.sq{
- position:relative;display:grid;place-items:center;border:0;border-radius:0;
- padding:0;font-size:clamp(24px,7vw,52px);line-height:1;
-}
-.sq.light{background:#dcece9}
-.sq.dark{background:#609b91}
-.sq.whitepiece{color:#fff;text-shadow:0 2px 2px #333,1px 0 #333,-1px 0 #333}
-.sq.blackpiece{color:#252525;text-shadow:0 1px 2px #fff8}
-.sq.selected{box-shadow:inset 0 0 0 4px #4de0cc}
-.sq.target:after{
- content:"";position:absolute;width:25%;height:25%;border-radius:50%;
- background:#163e39a8;
-}
-.sq.capture:after{
- content:"";position:absolute;inset:3px;
- border:4px solid #163e39a8;border-radius:50%;
-}
-.sq .coord{position:absolute;font-size:9px;left:3px;top:2px;color:#2229}
-.game-layout{
- display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);
- gap:16px;align-items:start;
-}
-.choice-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.choice-grid button{padding:10px 4px}
-.choice-grid button.chosen{border-color:var(--accent);background:rgba(69,181,169,.22)}
-input[type=checkbox]{accent-color:#55d7c7;width:18px;height:18px}
-.setting{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
-.setting:last-child{border:0}
-.notice{
- background:rgba(46,67,84,.54);color:#d9f4ef;
- border-color:rgba(100,215,202,.20);
- padding:12px;border-radius:12px;font-size:13px;line-height:1.5;
-}
-@media(max-width:700px){
- .app{padding:13px 12px 30px}
- .game-layout{grid-template-columns:1fr}
- .stats-grid{gap:8px}
- .stats-grid .card{padding:12px;border-radius:16px}
- .hero{padding:23px;border-radius:21px}
- .hero:after{font-size:130px;right:0}
- .choice-grid{grid-template-columns:repeat(4,1fr)}
- .top{margin-bottom:17px}
- .nav{margin-left:-2px;margin-right:-2px}
-}
-@media(max-width:380px){
- .stat{padding:8px;font-size:13px}
- .brand strong{font-size:16px}
- .nav button{padding:10px}
-}
-@media(prefers-reduced-motion:no-preference){
- .hero,.card{animation:glassIn .45s ease both}
- @keyframes glassIn{
-  from{opacity:.72;transform:translateY(5px)}
-  to{opacity:1;transform:translateY(0)}
- }
-}
+:root{--bg:#171b1a;--panel:#222826;--panel2:#2b3330;--line:#3b4641;--text:#edf2ee;--muted:#9ca9a1;--accent:#83b99a;--accent2:#a7d4b7;--boardLight:#e7e8df;--boardDark:#779987;--danger:#d98e85}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#34433b 0,transparent 48%),var(--bg);color:var(--text);font:15px Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button,select{font:inherit}button{cursor:pointer}.app{max-width:1160px;margin:auto;padding:20px 18px 50px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:43px;height:43px;border-radius:12px;background:#83b99a;color:#18211c;display:grid;place-items:center;font-size:26px;font-weight:800}.brand-name{font-weight:850;letter-spacing:2.5px;font-size:19px}.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}.header-right{display:flex;gap:8px}.pill{background:var(--panel);border:1px solid var(--line);padding:9px 12px;border-radius:12px;color:var(--muted);font-size:13px}
+nav{display:flex;gap:5px;overflow:auto;padding:6px;background:#202724;border:1px solid var(--line);border-radius:14px;margin-bottom:18px}nav button{border:0;background:transparent;color:var(--muted);padding:10px 15px;border-radius:9px;white-space:nowrap}nav button.active{background:#3b5145;color:#e9f4ec}
+.page{display:none}.page.active{display:block}.hero{background:linear-gradient(115deg,#2e3e35,#26332d);border:1px solid #52685a;border-radius:19px;padding:28px;position:relative;overflow:hidden}.eyebrow{color:var(--accent2);font-size:11px;letter-spacing:2px;font-weight:800}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.05;margin:12px 0}.hero p{color:#c2cec5;max-width:560px;line-height:1.65}.hero-mark{position:absolute;right:5%;bottom:-50px;font-size:190px;color:#ffffff0b;pointer-events:none}
+.btn{border:1px solid #4b5951;background:#303a34;color:var(--text);padding:11px 15px;border-radius:10px;font-weight:650}.btn:hover{filter:brightness(1.13)}.btn.primary{background:var(--accent);color:#17221b;border-color:var(--accent);font-weight:800}.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;gap:13px}.three{grid-template-columns:repeat(3,1fr);margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}.metric{font-size:27px;font-weight:850;margin:7px 0}.muted{color:var(--muted)}.small{font-size:12px}.section-title{font-size:26px;margin:7px 0}.progress{height:8px;background:#141917;border-radius:20px;overflow:hidden;margin-top:12px}.progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.two{grid-template-columns:1fr 1fr}.lesson-list{display:grid;gap:9px;margin:15px 0}.lesson{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px;color:var(--text)}.lesson small{display:block;color:var(--muted);margin-top:5px}
+.game-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:15px;align-items:start}.board-wrap{max-width:590px;margin:12px auto}.board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;width:100%;overflow:hidden;border:5px solid #414b45;border-radius:8px;box-shadow:0 12px 35px #0005}.sq{border:0;border-radius:0;padding:0;position:relative;display:grid;place-items:center;font-size:clamp(23px,6.4vw,55px);line-height:1}.sq.light{background:var(--boardLight)}.sq.dark{background:var(--boardDark)}.sq.whitepiece{color:#fff;text-shadow:0 1px 2px #333,1px 0 #333,-1px 0 #333}.sq.blackpiece{color:#202521;text-shadow:0 1px 1px #fff8}.sq.selected{box-shadow:inset 0 0 0 4px #e2c35e}.sq.target:after{content:"";position:absolute;width:23%;height:23%;border-radius:50%;background:#253b30a8}.sq.capture:after{content:"";position:absolute;inset:3px;border:4px solid #253b30a8;border-radius:50%}.sq.last{background:#c5bd6a!important}.sq.check{background:#d8897d!important}
+.controls{display:flex;gap:8px;flex-wrap:wrap}.field{width:100%;background:#171d1a;color:var(--text);border:1px solid var(--line);padding:11px;border-radius:10px}.rating-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-height:270px;overflow:auto;padding:2px}.rating-grid button{padding:9px 3px;font-size:13px}.rating-grid button.selected{background:#486653;border-color:#91c4a3;color:#fff}
+.status{padding:11px 12px;border-radius:10px;background:#303b34;color:#dce8df;font-size:13px;line-height:1.5}.status.error{background:#4b302d;color:#f3c3bc}.status.ok{background:#294437;color:#c8ead2}
+select{background:#171d1a;color:var(--text);border:1px solid var(--line);padding:10px;border-radius:9px}
+.setting{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.setting:last-child{border:0}input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px}
+@media(max-width:760px){.app{padding:13px 11px 35px}.game-layout{grid-template-columns:1fr}.hero{padding:22px}.hero-mark{font-size:130px;right:0}.three{gap:8px}.three .card{padding:12px}.rating-grid{grid-template-columns:repeat(4,1fr)}}
+@media(prefers-reduced-motion:no-preference){.card,.hero{animation:enter .3s ease}@keyframes enter{from{opacity:.7;transform:translateY(4px)}to{opacity:1;transform:none}}}
 </style>
 </head>
 <body>
 <div class="app">
-
-<header class="top">
- <div class="brand">
-  <div class="logo">♞</div>
-  <div>
-   <strong>CHESSUP<span style="color:var(--accent)">.</span></strong>
-   <small>YOUR CHESS JOURNEY</small>
-  </div>
- </div>
- <div class="stats">
-  <div class="stat">🔥 <span id="streak">1</span></div>
-  <div class="stat">⭐ <span id="xp">0</span></div>
- </div>
+<header>
+ <div class="brand"><div class="brand-mark">♞</div><div><div class="brand-name">CHESSUP</div><div class="brand-sub">PLAY · LEARN · IMPROVE</div></div></div>
+ <div class="header-right"><div class="pill">XP <b id="xp">0</b></div><div class="pill">Серия <b id="streak">1</b></div></div>
 </header>
-
-<nav class="nav">
- <button class="active" data-page="home">⌂ Главная</button>
- <button data-page="learn">♙ Обучение</button>
- <button data-page="puzzles">✦ Задачи</button>
- <button data-page="play">♟ Играть</button>
- <button data-page="settings">⚙ Настройки</button>
+<nav>
+ <button class="active" data-page="home">Главная</button><button data-page="play">Играть</button><button data-page="learn">Обучение</button><button data-page="puzzles">Задачи</button><button data-page="settings">Настройки</button>
 </nav>
-
 <main>
 <section class="page active" id="home">
- <div class="hero">
-  <div class="eyebrow">WELCOME TO CHESSUP</div>
-  <h1>Твой ход.<br>Твоя история.</h1>
-  <p>Освой шахматы с нуля, решай ежедневные задачи и постепенно повышай свой уровень.</p>
-  <button class="btn primary" data-open="learn">Начать обучение →</button>
- </div>
-
- <div class="grid stats-grid">
-  <div class="card">
-   <div>🔥</div>
-   <div class="big" id="homeStreak">1</div>
-   <div class="muted small">Дней подряд</div>
-  </div>
-  <div class="card">
-   <div>⭐</div>
-   <div class="big" id="homeXp">0</div>
-   <div class="muted small">Опыт</div>
-  </div>
-  <div class="card">
-   <div>♟</div>
-   <div class="big">100</div>
-   <div class="muted small">Стартовый ELO</div>
-  </div>
- </div>
-
- <div class="card">
-  <b>Твоя ежедневная цель</b>
-  <div class="progress"><span id="dailyProgress" style="width:0%"></span></div>
-  <div class="grid daily">
-   <div class="card"><div class="emoji">♙</div><b>Урок</b><div class="muted small">5 минут</div></div>
-   <div class="card"><div class="emoji">🧩</div><b>Задача</b><div class="muted small">3 минуты</div></div>
-   <div class="card"><div class="emoji">⚔️</div><b>Партия</b><div class="muted small">10 минут</div></div>
-  </div>
- </div>
-
- <div class="card" style="margin-top:14px">
-  <b>Продолжить обучение</b>
-  <p class="muted small">Знакомство с фигурами · Уровень 1</p>
-  <button class="btn" data-open="learn">Открыть урок →</button>
- </div>
+ <div class="hero"><div class="eyebrow">ТВОЯ ШАХМАТНАЯ ПЛАТФОРМА</div><h1>Думай точнее.<br>Играй сильнее.</h1><p>Тренируйся против Stockfish, выбирай уровень соперника, разбирай партии и постепенно повышай свой уровень.</p><button class="btn primary" data-open="play">Начать партию</button><div class="hero-mark">♞</div></div>
+ <div class="grid three"><div class="card"><div class="muted small">НАКОПЛЕННЫЙ ОПЫТ</div><div class="metric" id="homeXp">0</div><div class="muted small">XP</div></div><div class="card"><div class="muted small">ДНЕЙ ПОДРЯД</div><div class="metric" id="homeStreak">1</div><div class="muted small">Твоя серия</div></div><div class="card"><div class="muted small">СЫГРАНО ПАРТИЙ</div><div class="metric" id="gamesCount">0</div><div class="muted small">На этом устройстве</div></div></div>
+ <div class="card"><b>Прогресс на сегодня</b><div class="progress"><span id="progressBar"></span></div><p class="muted small" id="progressText">Сыграй партию или пройди урок.</p></div>
 </section>
-
-<section class="page" id="learn">
- <h2 class="section-title">Академия шахмат</h2>
- <p class="muted">От первых правил до тактических комбинаций.</p>
- <div class="lesson-list" id="lessonList"></div>
- <div class="card" id="lessonContent">
-  <b>Выбери урок</b>
-  <p class="muted">Здесь появится объяснение и короткое задание.</p>
- </div>
-</section>
-
-<section class="page" id="puzzles">
- <h2 class="section-title">Задача дня 🧩</h2>
- <p class="muted">Решай задачки и зарабатывай опыт.</p>
- <div class="card">
-  <div class="eyebrow">ЗАДАНИЕ · НОВИЧОК</div>
-  <h3>Найди лучший ход</h3>
-  <p class="muted small">Белый конь стоит на b1. На какую клетку ему нужно пойти, чтобы атаковать чёрную пешку на d5?</p>
-  <div class="board-wrap"><div class="board" id="puzzleBoard"></div></div>
-  <p id="puzzleMessage" class="muted small">Выбери ответ:</p>
-  <div class="grid" style="grid-template-columns:repeat(3,1fr)">
-   <button class="btn" data-answer="d2">Nd2</button>
-   <button class="btn" data-answer="c3">Nc3</button>
-   <button class="btn" data-answer="a3">Na3</button>
-  </div>
-  <p class="small muted">Подсказка: конь ходит буквой «Г».</p>
- </div>
-</section>
-
 <section class="page" id="play">
- <h2 class="section-title">Играть в шахматы</h2>
- <p class="muted">Выбери соперника и начинай партию.</p>
-
- <div class="grid" style="grid-template-columns:repeat(2,1fr);margin:14px 0">
-  <button class="card" id="botMode" style="text-align:left;color:var(--text)">
-   <div style="font-size:30px">🤖</div>
-   <b>Против бота</b>
-   <div class="muted small">Выбери сложность</div>
-  </button>
-  <button class="card" id="friendMode" style="text-align:left;color:var(--text)">
-   <div style="font-size:30px">👥</div>
-   <b>С другом</b>
-   <div class="muted small">На одном устройстве</div>
-  </button>
- </div>
-
+ <h2 class="section-title">Игровая арена</h2><p class="muted">Выбери силу Stockfish и настрой партию.</p>
  <div class="game-layout">
-  <div class="card" id="setupCard">
-   <b>Выбери рейтинг бота</b>
-   <p class="muted small">Чем выше ELO, тем сложнее соперник.</p>
-   <div class="choice-grid" id="eloGrid"></div>
-   <p class="small muted">Выбрано: <b id="eloLabel">100 ELO</b></p>
-   <button class="btn primary" id="startGame" style="width:100%">Начать игру →</button>
+  <div class="card">
+   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Шахматная доска</b><span class="muted small" id="turnLabel">Белые ходят</span></div>
+   <div class="board-wrap"><div class="board" id="board"></div></div>
+   <div class="controls"><button class="btn" id="undoBtn">Отменить ход</button><button class="btn" id="flipBtn">Перевернуть доску</button><button class="btn" id="newBtn">Новая партия</button></div>
+   <div class="status" id="gameStatus" style="margin-top:11px">Загрузи движок, выбери уровень и начни игру.</div>
   </div>
-
-  <div class="card" id="gameCard" style="display:none">
-   <div style="display:flex;justify-content:space-between;gap:10px">
-    <b id="gameTitle">Партия</b>
-    <span class="muted small" id="turnLabel">Ход белых</span>
+  <div class="card">
+   <b>Соперник: Stockfish</b>
+   <p class="muted small">Выбери примерную силу движка. Stockfish — настоящий шахматный движок; отображаемый ELO является ориентиром, а не гарантированным рейтингом.</p>
+   <div class="status" id="engineStatus">Движок ещё не загружен.</div>
+   <div style="margin:13px 0 8px"><b class="small">УРОВЕНЬ СОПЕРНИКА</b><span class="muted small" style="float:right" id="eloLabel">1500 ELO</span></div>
+   <div class="rating-grid" id="ratingGrid"></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+    <label class="small muted">Ты играешь за<select id="colorSelect" class="field"><option value="w">Белых</option><option value="b">Чёрных</option></select></label>
+    <label class="small muted">Время<select id="timeSelect" class="field"><option value="0">Без таймера</option><option value="60">1 минута</option><option value="180">3 минуты</option><option value="300">5 минут</option><option value="600">10 минут</option></select></label>
    </div>
-   <div class="board-wrap"><div class="board" id="gameBoard"></div></div>
-   <p class="muted small" id="gameMessage">Выбери фигуру, затем клетку.</p>
-   <button class="btn" id="hintBtn">💡 Лучший ход</button>
-   <button class="btn" id="newGameBtn">↻ Заново</button>
-   <p class="small muted" id="hintText"></p>
+   <button class="btn primary" id="startBtn" style="width:100%;margin-top:12px">Начать игру</button>
+   <div class="controls" style="margin-top:9px"><button class="btn" id="hintBtn">Подсказка хода</button><button class="btn" id="analyzeBtn">Оценить позицию</button></div>
+   <div class="muted small" id="analysis" style="margin-top:10px;line-height:1.5">Оценка позиции появится здесь.</div>
   </div>
- </div>
-
- <div class="notice" style="margin-top:14px">
-  Примечание: рейтинги ботов в этой версии — уровни сложности-пресеты, а не официально измеренная сила ELO. Для полноценного шахматного ИИ можно подключить Stockfish.
  </div>
 </section>
-
+<section class="page" id="learn">
+ <h2 class="section-title">Обучение</h2><p class="muted">Короткие уроки для развития шахматного мышления.</p><div class="lesson-list" id="lessons"></div><div class="card" id="lessonText">Выбери урок, чтобы открыть материал.</div>
+</section>
+<section class="page" id="puzzles">
+ <h2 class="section-title">Тактическая задача</h2><div class="card"><b>Найди сильный ход</b><p class="muted">В этой демо-задаче конь с b1 может перейти на c3 и атаковать пешку d5.</p><button class="btn primary" id="showAnswer">Показать ответ</button><p id="puzzleAnswer" class="muted small"></p></div>
+</section>
 <section class="page" id="settings">
- <h2 class="section-title">Настройки</h2>
- <p class="muted">Настрой приложение под себя.</p>
- <div class="card" style="margin-top:14px">
-  <b>Игровой процесс</b>
-  <label class="setting">Показывать подсказки <input type="checkbox" id="hintSetting" checked></label>
-  <label class="setting">Подсвечивать возможные ходы <input type="checkbox" id="highlightSetting" checked></label>
-  <label class="setting">Звуки <input type="checkbox" id="soundSetting"></label>
- </div>
- <div class="card" style="margin-top:14px">
-  <b>Прогресс</b>
-  <p class="muted small">Опыт и серия хранятся в этом браузере.</p>
-  <button class="btn" id="resetProgress">Сбросить прогресс</button>
- </div>
+ <h2 class="section-title">Настройки</h2><div class="card"><label class="setting">Подсветка возможных ходов<input type="checkbox" id="highlight" checked></label><label class="setting">Подтверждать новую партию<input type="checkbox" id="confirmNew" checked></label><label class="setting">Автоматически переворачивать доску за чёрных<input type="checkbox" id="autoFlip"></label><p class="muted small">Прогресс хранится локально в браузере на этом устройстве.</p><button class="btn" id="resetProgress">Сбросить прогресс</button></div>
 </section>
 </main>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script>
-(() => {
+(()=>{
 'use strict';
-
 const $=id=>document.getElementById(id);
-const saved=JSON.parse(localStorage.getItem('chessup-progress')||'{}');
-
-let xp=saved.xp||0;
-let streak=saved.streak||1;
-let lastDay=saved.lastDay||new Date().toDateString();
-
-const today=new Date().toDateString();
-
-if(lastDay!==today){
- const yesterday=new Date(Date.now()-86400000).toDateString();
- streak=lastDay===yesterday?streak+1:1;
- lastDay=today;
+const store=JSON.parse(localStorage.getItem('chessup')||'{}');
+let xp=store.xp||0,games=store.games||0,streak=store.streak||1;
+let chess=null,engine=null,engineReady=false,engineBusy=false,searchPurpose='move',selected=null,legal=[],flipped=false,lastMove=null,playerColor='w',gameActive=false,gameSeconds=0,timer=null,chosenElo=1500;
+const pieces={wk:'♔',wq:'♕',wr:'♖',wb:'♗',wn:'♘',wp:'♙',bk:'♚',bq:'♛',br:'♜',bb:'♝',bn:'♞',bp:'♟'};
+function save(){localStorage.setItem('chessup',JSON.stringify({xp,games,streak}));$('xp').textContent=$('homeXp').textContent=xp;$('gamesCount').textContent=games;$('streak').textContent=$('homeStreak').textContent=streak;$('progressBar').style.width=Math.min(100,games*10)+'%';$('progressText').textContent=games?'Партии сыграны: '+games:'Сыграй первую партию.'}
+function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id))}
+document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>page(b.dataset.page));document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>page(b.dataset.open));
+function status(msg,type=''){const el=$('gameStatus');el.textContent=msg;el.className='status '+type}
+function engineStatus(msg,type=''){const el=$('engineStatus');el.textContent=msg;el.className='status '+type}
+function initEngine(){
+ if(engine)return;
+ engineStatus('Подключаем Stockfish…');
+ const base='https://cdn.jsdelivr.net/npm/stockfish@17.1.0/bin/';
+ const workerCode=`self.Module={locateFile:(p)=>'${base}'+p};importScripts('${base}stockfish-17.1-lite-single.js');`;
+ try{
+  const blob=new Blob([workerCode],{type:'text/javascript'});
+  engine=new Worker(URL.createObjectURL(blob));
+  engine.onmessage=e=>onEngineMessage(String(e.data));
+  engine.onerror=()=>{engineReady=false;engineStatus('Не удалось загрузить Stockfish. Проверь интернет и попробуй снова.','error')};
+  engine.postMessage('uci');
+ }catch(e){engineStatus('Браузер не разрешил запустить шахматный движок.','error')}
 }
-
-let hintEnabled=true;
-let highlightEnabled=true;
-let selected=null;
-let legal=[];
-let game=null;
-let mode='bot';
-let elo=100;
-let botThinking=false;
-let taskDone=!!saved.taskDone&&saved.taskDay===today;
-
-const lessons=[
- ['♙','Знакомство с шахматами','Узнай, как устроена доска.','Шахматы — игра для двух игроков. Доска состоит из 64 клеток: 8 рядов и 8 вертикалей. Белые всегда делают первый ход. Цель — поставить королю соперника мат.'],
- ['♜','Шахматные фигуры','Познакомься со всеми фигурами.','В шахматах есть король, ферзь, две ладьи, два слона, два коня и восемь пешек. У каждой фигуры свои правила движения.'],
- ['♘','Как ходят фигуры','Научись правильно перемещать фигуры.','Ладья ходит по горизонтали и вертикали; слон — по диагонали; ферзь — в любом из этих направлений; конь — буквой Г; король — на одну клетку. Пешка обычно ходит вперёд на одну клетку и бьёт по диагонали.'],
- ['♔','Шах и мат','Пойми главные правила атаки.','Шах — это угроза королю. Мат — шах, от которого нельзя защититься. Нельзя делать ход, после которого твой король остаётся под шахом.'],
- ['⚔️','Тактика','Учись замечать возможности.','Вилки, связки, двойные нападения и открытые атаки помогают выигрывать материал. Перед каждым ходом проверяй угрозы соперника.'],
- ['🏆','Начало партии','Освой хорошие дебютные привычки.','Старайся бороться за центр, развивать коней и слонов, а затем делать рокировку. Не выводи ферзя слишком рано и не ходи одной фигурой много раз без причины.']
-];
-
-function save(){
- localStorage.setItem('chessup-progress',JSON.stringify({
-  xp,streak,lastDay,taskDone,taskDay:today
- }));
-}
-
-function update(){
- ['xp','homeXp'].forEach(id=>$(id).textContent=xp);
- ['streak','homeStreak'].forEach(id=>$(id).textContent=streak);
- $('dailyProgress').style.width=(taskDone?33:0)+'%';
- save();
-}
-
-function award(n){
- xp+=n;
- update();
-}
-
-function page(id){
- document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
- document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
-}
-
-document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>page(b.dataset.page));
-document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>page(b.dataset.open));
-
-lessons.forEach((l,i)=>{
- const b=document.createElement('button');
- b.className='lesson';
- b.innerHTML=`<span class="ico">${l[0]}</span><span><b>${i+1}. ${l[1]}</b><small>${l[2]}</small></span><span>→</span>`;
- b.onclick=()=>{
-  $('lessonContent').innerHTML=`
-   <div class="eyebrow">УРОК ${i+1}</div>
-   <h3>${l[1]}</h3>
-   <p class="muted" style="line-height:1.65">${l[3]}</p>
-   <button class="btn primary" id="finishLesson">Урок пройден · +15 XP</button>`;
-  $('finishLesson').onclick=()=>{
-   award(15);
-   $('lessonContent').innerHTML='<b>Отличная работа! +15 XP ⭐</b><p class="muted">Можешь переходить к следующему уроку.</p>';
-  };
- };
- $('lessonList').appendChild(b);
-});
-
-const symbols={
- wk:'♔',wq:'♕',wr:'♖',wb:'♗',wn:'♘',wp:'♙',
- bk:'♚',bq:'♛',br:'♜',bb:'♝',bn:'♞',bp:'♟'
-};
-
-function renderBoard(id,chess,selectedSq=null,moves=[]){
- const el=$(id);
- el.innerHTML='';
- const fen=chess.board();
-
- for(let r=0;r<8;r++){
-  for(let c=0;c<8;c++){
-   const sq=String.fromCharCode(97+c)+(8-r);
-   const p=fen[r][c];
-   const btn=document.createElement('button');
-
-   btn.className='sq '+((r+c)%2?'dark':'light');
-
-   if(p){
-    btn.textContent=symbols[p.color+p.type];
-    btn.classList.add(p.color==='w'?'whitepiece':'blackpiece');
-   }
-
-   if(selectedSq===sq)btn.classList.add('selected');
-
-   const target=moves.find(m=>m.to===sq);
-   if(target)btn.classList.add(p?'capture':'target');
-
-   btn.dataset.square=sq;
-   btn.onclick=()=>squareClick(sq);
-   el.appendChild(btn);
+function onEngineMessage(msg){
+ if(msg==='uciok'){
+  engine.postMessage('setoption name Threads value 1');
+  engine.postMessage('setoption name Hash value 32');
+  engine.postMessage('isready');
+ }else if(msg==='readyok'){
+  engineReady=true;engineBusy=false;engineStatus('Stockfish готов к игре.','ok');
+ }else if(msg.startsWith('bestmove')){
+  engineBusy=false;
+  const uci=msg.split(/\s+/)[1];
+  if(searchPurpose==='hint'){
+   $('analysis').textContent=uci&&uci!=='(none)'?'Подсказка Stockfish: '+uci.slice(0,2)+' → '+uci.slice(2,4):'Нет доступного хода.';
+   return;
   }
+  if(searchPurpose==='analysis')return;
+  if(!uci||uci==='(none)'||!chess||chess.game_over())return;
+  const move=chess.move({from:uci.slice(0,2),to:uci.slice(2,4),promotion:uci[4]||'q'});
+  if(move){lastMove={from:move.from,to:move.to};selected=null;legal=[];render();checkEnd();if(chess.turn()===playerColor&&gameActive)status('Твой ход.')}
+ }else if(msg.includes(' score cp ')||msg.includes(' score mate ')){
+  const cp=msg.match(/score cp (-?\d+)/),mate=msg.match(/score mate (-?\d+)/);
+  if(cp)$('analysis').textContent='Оценка позиции со стороны белых: '+(Number(cp[1])/100).toFixed(2);
+  else if(mate)$('analysis').textContent='Мат через '+mate[1]+' ход(ов).';
  }
 }
-
-function draw(){
- if(!game)return;
- renderBoard('gameBoard',game,selected,legal);
- $('turnLabel').textContent=game.game_over()?'Игра окончена':game.turn()==='w'?'Ход белых':'Ход чёрных';
+function setStrength(){
+ if(!engineReady)return;
+ engine.postMessage('setoption name UCI_LimitStrength value false');
+ if(chosenElo>=1320&&chosenElo<=3190){
+  engine.postMessage('setoption name UCI_LimitStrength value true');
+  engine.postMessage('setoption name UCI_Elo value '+chosenElo);
+ }else{
+  const skill=Math.max(0,Math.min(20,Math.round((chosenElo-400)/46)));
+  engine.postMessage('setoption name Skill Level value '+skill);
+ }
 }
-
+function askEngine(command){if(!engineReady||engineBusy)return false;engineBusy=true;engine.postMessage('position fen '+chess.fen());engine.postMessage(command);return true}
+function engineMove(){
+ searchPurpose='move';
+ if(!gameActive||!chess||chess.game_over()||chess.turn()===playerColor)return;
+ if(!engineReady){status('Stockfish ещё загружается. Подожди немного.');return}
+ setStrength();status('Stockfish думает…');
+ askEngine('go movetime '+(chosenElo<900?350:chosenElo<1600?550:chosenElo<2400?850:1200));
+}
+function boardOrder(){let a=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++){let rr=flipped?7-r:r,cc=flipped?7-c:c;a.push({r:rr,c:cc,sq:String.fromCharCode(97+cc)+(8-rr)})}return a}
+function render(){
+ if(!chess)return;
+ const board=$('board');board.innerHTML='';
+ const b=chess.board();
+ for(const cell of boardOrder()){
+  const {r,c,sq}=cell,p=b[r][c],el=document.createElement('button');
+  el.className='sq '+((r+c)%2?'dark':'light');if(p){el.textContent=pieces[p.color+p.type];el.classList.add(p.color==='w'?'whitepiece':'blackpiece')}
+  if(selected===sq)el.classList.add('selected');
+  if(lastMove&&(lastMove.from===sq||lastMove.to===sq))el.classList.add('last');
+  if(chess.is_check()&&p&&p.type==='k'&&p.color===chess.turn())el.classList.add('check');
+  const m=legal.find(x=>x.to===sq);if(m)el.classList.add(p?'capture':'target');
+  el.onclick=()=>squareClick(sq);board.appendChild(el);
+ }
+ $('turnLabel').textContent=chess.game_over()?'Партия завершена':chess.turn()==='w'?'Ход белых':'Ход чёрных';
+}
 function squareClick(sq){
- if(!game||game.game_over()||botThinking)return;
- if(mode==='bot'&&game.turn()==='b')return;
-
+ if(!gameActive||engineBusy||chess.game_over()||chess.turn()!==playerColor)return;
  if(selected&&legal.some(m=>m.to===sq)){
-  const move=game.move({from:selected,to:sq,promotion:'q'});
-  if(move){
-   selected=null;
-   legal=[];
-   draw();
-   afterMove();
-  }
-  return;
+  const m=chess.move({from:selected,to:sq,promotion:'q'});
+  if(m){lastMove={from:m.from,to:m.to};selected=null;legal=[];render();checkEnd();if(!chess.game_over())engineMove()}return;
  }
-
- const piece=game.get(sq);
-
- if(piece&&piece.color===game.turn()){
-  selected=sq;
-  legal=game.moves({square:sq,verbose:true});
-  if(!highlightEnabled)legal=[];
- }else{
-  selected=null;
-  legal=[];
- }
-
- draw();
+ const p=chess.get(sq);
+ if(p&&p.color===playerColor){selected=sq;legal=chess.moves({square:sq,verbose:true});if(!$('highlight').checked)legal=[]}
+ else{selected=null;legal=[]}
+ render();
 }
-
-function afterMove(){
- if(game.in_checkmate()){
-  $('gameMessage').textContent=game.turn()==='w'?'Мат! Победили чёрные.':'Мат! Победили белые.';
-  if(mode==='friend'&&game.turn()==='b')award(10);
- }
- else if(game.in_draw()){
-  $('gameMessage').textContent='Ничья.';
- }
- else{
-  $('gameMessage').textContent=game.in_check()?'Шах! Защити короля.':'Ход выполнен.';
- }
-
- if(mode==='bot'&&game.turn()==='b'&&!game.game_over()){
-  setTimeout(botMove,450);
- }
+function checkEnd(){
+ render();
+ if(!chess.game_over())return;
+ gameActive=false;clearInterval(timer);
+ if(chess.in_checkmate())status(chess.turn()===playerColor?'Мат. Stockfish победил.':'Мат! Ты выиграл.','ok');
+ else if(chess.in_draw())status('Ничья.');
+ else status('Партия завершена.');
+ games++;xp+=chess.in_checkmate()&&chess.turn()!==playerColor?50:15;save();
 }
-
-function botMove(){
- if(!game||game.game_over())return;
-
- botThinking=true;
- $('gameMessage').textContent='Бот думает…';
-
- const all=game.moves({verbose:true});
- if(!all.length){
-  botThinking=false;
-  return;
- }
-
- let ranked=all.map(m=>({
-  m,
-  score:(m.captured?({p:1,n:3,b:3,r:5,q:9}[m.captured]||0):0)+Math.random()*(elo>=1500?1.4:5)
- }));
-
- ranked.sort((a,b)=>b.score-a.score);
-
- let pool=elo>=2000
-  ?ranked.slice(0,Math.max(1,Math.ceil(ranked.length*.15)))
-  :elo>=1000
-  ?ranked.slice(0,Math.max(1,Math.ceil(ranked.length*.4)))
-  :ranked.slice(0,Math.max(1,Math.ceil(ranked.length*.8)));
-
- let chosen=pool[Math.floor(Math.random()*pool.length)].m;
-
- game.move(chosen);
- botThinking=false;
- draw();
- afterMove();
+function startGame(force=false){
+ if(typeof Chess==='undefined'){status('Не удалось загрузить правила шахмат (chess.js). Проверь интернет.','error');return}
+ if(!force&&chess&&gameActive&&$('confirmNew').checked&&!confirm('Начать новую партию? Текущая партия завершится.'))return;
+ initEngine();clearInterval(timer);chess=new Chess();selected=null;legal=[];lastMove=null;playerColor=$('colorSelect').value;flipped=playerColor==='b'&&$('autoFlip').checked;gameActive=true;gameSeconds=Number($('timeSelect').value)*60;render();
+ status(engineReady?'Партия началась. Твой ход.':'Партия началась. Stockfish загружается…');
+ if(gameSeconds>0){timer=setInterval(()=>{gameSeconds--;if(gameSeconds<=0){clearInterval(timer);gameActive=false;status('Время вышло. Партия завершена.','error')}},1000)}
+ if(playerColor==='b')setTimeout(engineMove,250);
 }
-
-function startGame(){
- if(typeof Chess==='undefined'){
-  $('gameMessage').textContent='Не загрузилась шахматная библиотека. Проверь интернет и обнови страницу.';
-  return;
- }
-
- game=new Chess();
- selected=null;
- legal=[];
- botThinking=false;
-
- $('gameCard').style.display='block';
- $('gameTitle').textContent=mode==='bot'?`Против бота · ${elo} ELO`:'Игра с другом';
- $('gameMessage').textContent='Белые начинают. Выбери фигуру.';
- $('hintText').textContent='';
-
- draw();
-}
-
-$('friendMode').onclick=()=>{
- mode='friend';
- $('setupCard').style.display='block';
- $('setupCard').querySelector('b').textContent='Игра на одном устройстве';
- $('setupCard').querySelector('p').textContent='Передавай телефон после каждого хода. Белые начинают.';
- $('eloGrid').style.display='none';
- $('eloLabel').style.display='none';
- $('startGame').textContent='Начать партию →';
- $('gameCard').style.display='none';
-};
-
-const ratings=[100,200,250,300,...Array.from({length:28},(_,i)=>(i+4)*100)];
-
-ratings.forEach((v,i)=>{
- const b=document.createElement('button');
- b.className='btn'+(i===0?' chosen':'');
- b.textContent=v;
- b.onclick=()=>{
-  elo=v;
-  document.querySelectorAll('#eloGrid button').forEach(x=>x.classList.remove('chosen'));
-  b.classList.add('chosen');
-  $('eloLabel').textContent=v+' ELO';
- };
- $('eloGrid').appendChild(b);
-});
-
-$('botMode').onclick=()=>{
- mode='bot';
- $('setupCard').querySelector('b').textContent='Выбери рейтинг бота';
- $('setupCard').querySelector('p').textContent='Чем выше ELO, тем сложнее соперник.';
- $('eloGrid').style.display='grid';
- $('eloLabel').style.display='block';
- $('startGame').textContent='Начать игру →';
- $('setupCard').style.display='block';
- $('gameCard').style.display='none';
-};
-
-$('startGame').onclick=startGame;
-$('newGameBtn').onclick=startGame;
-
-$('hintBtn').onclick=()=>{
- if(!hintEnabled){
-  $('hintText').textContent='Подсказки отключены в настройках.';
-  return;
- }
-
- if(!game||game.turn()!=='w'||game.game_over()){
-  $('hintText').textContent='Сейчас подсказка недоступна.';
-  return;
- }
-
- const ms=game.moves({verbose:true});
- if(!ms.length)return;
-
- const capture=ms.find(m=>m.captured);
- const m=capture||ms[Math.floor(Math.random()*ms.length)];
-
- $('hintText').textContent=`Попробуй: ${m.from} → ${m.to}. Это упрощённая подсказка, не анализ Stockfish.`;
- selected=m.from;
- legal=game.moves({square:m.from,verbose:true});
- draw();
-};
-
-$('hintSetting').onchange=e=>hintEnabled=e.target.checked;
-$('highlightSetting').onchange=e=>{
- highlightEnabled=e.target.checked;
- legal=[];
- draw();
-};
-
-$('resetProgress').onclick=()=>{
- if(confirm('Сбросить опыт и огонёк?')){
-  xp=0;
-  streak=1;
-  taskDone=false;
-  update();
- }
-};
-
-const puzzle=new Chess('8/8/8/3p4/8/8/8/1N2K3 w - - 0 1');
-renderBoard('puzzleBoard',puzzle);
-
-document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{
- if(taskDone){
-  $('puzzleMessage').textContent='Задача уже решена сегодня. Возвращайся завтра!';
-  return;
- }
-
- if(b.dataset.answer==='c3'){
-  taskDone=true;
-  award(25);
-  $('puzzleMessage').textContent='Верно! Конь на c3 атакует пешку d5. +25 XP 🔥';
- }else{
-  $('puzzleMessage').textContent='Не совсем. С c3 конь атакует d5 буквой Г. Попробуй ещё раз.';
- }
-});
-
-update();
+const ratings=[];for(let x=400;x<=3200;x+=100)ratings.push(x);
+ratings.forEach(v=>{const b=document.createElement('button');b.className='btn'+(v===chosenElo?' selected':'');b.textContent=v;b.onclick=()=>{chosenElo=v;$('eloLabel').textContent=v+' ELO';document.querySelectorAll('#ratingGrid button').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');if(engineReady)setStrength()};$('ratingGrid').appendChild(b)});
+$('startBtn').onclick=()=>startGame();$('newBtn').onclick=()=>startGame();$('undoBtn').onclick=()=>{if(!chess||!gameActive||engineBusy)return;chess.undo();if(modeIsBot())chess.undo();selected=null;legal=[];lastMove=null;render();status('Последний ход отменён.');};function modeIsBot(){return true}
+$('flipBtn').onclick=()=>{flipped=!flipped;render()};
+$('hintBtn').onclick=()=>{searchPurpose='hint';if(!chess||!gameActive||chess.turn()!==playerColor){$('analysis').textContent='Подсказка доступна в твой ход.';return}if(!engineReady){$('analysis').textContent='Stockfish ещё загружается.';return}engine.postMessage('position fen '+chess.fen());engine.postMessage('go depth 12');$('analysis').textContent='Stockfish ищет лучший ход…';engineBusy=true;const old=engine.onmessage;};
+$('analyzeBtn').onclick=()=>{searchPurpose='analysis';if(!chess||!engineReady||engineBusy){$('analysis').textContent='Сначала запусти партию и дождись готовности движка.';return}engine.postMessage('position fen '+chess.fen());engine.postMessage('go depth 15');$('analysis').textContent='Анализирую позицию…';engineBusy=true};
+$('showAnswer').onclick=()=>{$('puzzleAnswer').textContent='Ответ: Nc3 — конь с b1 переходит на c3 и атакует пешку d5.';xp+=5;save()};
+const lessonData=[['Правила и цель','Цель игры — поставить мат королю соперника. Белые ходят первыми. Нельзя оставлять своего короля под шахом.'],['Движение фигур','Ладья ходит по прямой, слон по диагонали, ферзь в обоих направлениях. Конь ходит буквой Г, король — на одну клетку. Пешка ходит вперёд и бьёт по диагонали.'],['Дебют','Борись за центр, развивай лёгкие фигуры, сделай рокировку и не трать темпы на повторные ходы одной фигурой.'],['Тактика','Ищи вилки, связки, двойные удары и незащищённые фигуры. Перед каждым ходом проверяй угрозы соперника.']];
+lessonData.forEach((l,i)=>{const b=document.createElement('button');b.className='lesson';b.innerHTML='<b>Урок '+(i+1)+'. '+l[0]+'</b><small>Открыть материал</small>';b.onclick=()=>{$('lessonText').innerHTML='<b>'+l[0]+'</b><p class="muted" style="line-height:1.7">'+l[1]+'</p><button class="btn primary" id="doneLesson">Урок пройден · +10 XP</button>';$('doneLesson').onclick=()=>{xp+=10;save();$('lessonText').insertAdjacentHTML('beforeend','<p class="muted small">Опыт начислен.</p>')}};$('lessons').appendChild(b)});
+$('resetProgress').onclick=()=>{if(confirm('Сбросить XP и статистику?')){xp=0;games=0;streak=1;save()}};
+$('highlight').onchange=()=>{legal=[];render()};
+save();
 })();
 </script>
 </body>
